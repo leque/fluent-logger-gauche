@@ -1,0 +1,80 @@
+# fluent-logger-gauche
+
+A structured logger for https://www.fluentd.org/[Fluentd]
+implemented in http://practical-scheme.net/gauche/[Gauche].
+
+## LICENSE
+
+MIT
+
+## API
+### Module: `fluent-logger`
+#### Class: `<fluent-logger>`
+Instance Variable of `<fluent-logger>`: `tag` ::
+
+The tag prefix string used for this logger.
+
+Instance Variable of `<fluent-logger>`: `sender` ::
+
+The `<fluent-logger-sender>` instance used to send logs.
+
+#### Procedure: `fluent-logger-log logger label :rest key value ...`
+#### Procedure: `fluent-logger-log logger label timestamp :rest key value ...`
+
+Sends a log message.
+
+`logger` :: The `<fluent-logger>` instance.
+`label` :: The string label for the log message.
+  The tag of the log will be `tag.label`.
+`timestamp` :: The optional timestamp `<time>` or unixtime integer in seconds.
+   If omitted or `#f` is supplied, `(current-time)` is used.
+`key` `value` ... :: key-value pairs of the log record fields.
+  ``key``s must be `<keyword>` and ``value``s must be able to be converted to JSON by `construct-json-string` procedure.
+
+For example, the code below
+
+[source,scheme]
+----
+(define sender (make-fluent-logger-inet-socket-sender))
+(define logger (make <fluent-logger> :sender sender :tag "tag"))
+
+(fluent-logger-log logger "name" :message "bar")
+----
+
+sends a log message such as
+
+[source,json]
+----
+[
+  "tag.name",
+  1441588984,
+  {"message": "bar"}
+]
+----
+
+#### Procedure: `fluent-logger-flush logger`
+
+Flushes ``logger``'s buffer.
+
+#### Procedure: `fluent-logger-close logger`
+
+Closes `logger`. Also flushes ``logger``'s buffer.
+
+### Module: `fluent-logger.sender`
+#### Class: `<fluent-logger-sender>`
+
+Abstract class representing a log sender.
+
+### Module: `fluent-logger.sender.socket-sender`
+#### Procedure: `make-fluent-logger-inet-socket-sender :key host port log-drain timeout buffer-capaticy buffer-overflow-handler`
+
+Create a sender which sends log messages via an inet socket.
+This sender connect/reconnect to the host as needed.
+If you do not send log messages, the sender does not connect to the host.
+
+`host` :: the hostname string. The default is `"localhost"`.
+`port` :: the port number. The default is `24224`.
+`log-drain` :: the `<log-drain>` for internal logging. The default log-drain does not record any internal logs.
+`timeout` :: timeout for send, in seconds. The default timeout is 3000 sec.
+`buffer-capacity` :: the size in bytes of the internal buffer which contains pending log messages. A size of each log messages must be less than or equal to this value. The default is 8MB.
+`buffer-overflow-handler` :: when the internal buffer overflows, this procedure is called with 3 arguments: the sender, the buffer port created by `open-output-uvector`, and the message string that is being put into the buffer. The default handler simply ignore overflows.
