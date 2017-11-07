@@ -9,7 +9,7 @@ MIT
 
 ## Requirement
 
-* Gauche 0.9.4 or later
+* Gauche 0.9.5 or later
 
 ## Installation
 

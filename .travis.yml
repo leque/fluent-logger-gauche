@@ -7,7 +7,6 @@ addons:
     - libgdbm-dev
     - autoconf
 env:
-  - GAUCHE_VERSION=0.9.4
   - GAUCHE_VERSION=0.9.5
 before_install:
   - sh .travis-gauche.sh
