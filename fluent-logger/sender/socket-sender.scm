@@ -18,7 +18,8 @@
 ;; THE SOFTWARE.
 
 (define-module fluent-logger.sender.socket-sender
-  (export make-fluent-logger-inet-socket-sender)
+  (export make-fluent-logger-inet-socket-sender
+          make-fluent-logger-unix-domain-socket-sender)
   (use gauche.fcntl)
   (use gauche.logger)
   (use gauche.net)
@@ -74,10 +75,19 @@
   (cond (s => socket-status)
         (else #f)))
 
+(define-class <fluent-logger-unix-domain-socket-sender> (<fluent-logger-socket-sender>)
+  ((path
+    :init-keyword :path)))
+
 (define-method write-object ((sender <fluent-logger-inet-socket-sender>) port)
   (format port "#<fluent-logger-inet-socket-sender ~A:~A (~A)>"
           (~ sender 'host)
           (~ sender 'port)
+          (%sock-status (~ sender 'socket))))
+
+(define-method write-object ((sender <fluent-logger-unix-domain-socket-sender>) port)
+  (format port "#<fluent-logger-inet-socket-sender ~A (~A)>"
+          (~ sender 'path)
           (%sock-status (~ sender 'socket))))
 
 (define default-timeout (* 3 1000))
@@ -98,6 +108,24 @@
       :port port
       :make-socket (lambda ()
                      (make-client-socket 'inet host port))
+      :log-drain log-drain
+      :timeout timeout
+      :buffer (open-output-uvector buf :extendable #f)
+      :buffer-capacity buffer-capacity
+      :buffer-overflow-handler buffer-overflow-handler)))
+
+(define (make-fluent-logger-unix-domain-socket-sender
+         :key
+         path
+         (log-drain (make <log-drain>))
+         (timeout default-timeout)
+         (buffer-capacity default-buffer-capacity)
+         (buffer-overflow-handler values))
+  (let ((buf (make-u8vector buffer-capacity)))
+    (make <fluent-logger-inet-socket-sender>
+      :path path
+      :make-socket (lambda ()
+                     (make-client-socket 'unix path))
       :log-drain log-drain
       :timeout timeout
       :buffer (open-output-uvector buf :extendable #f)

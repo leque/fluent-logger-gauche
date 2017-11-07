@@ -66,6 +66,7 @@ Closes `logger`. Also flushes ``logger``'s buffer.
 Abstract class representing a log sender.
 
 ### Module: `fluent-logger.sender.socket-sender`
+[[make-fluent-logger-inet-socket-sender]]
 #### Procedure: `make-fluent-logger-inet-socket-sender :key host port log-drain timeout buffer-capaticy buffer-overflow-handler`
 
 Create a sender which sends log messages via an inet socket.
@@ -78,3 +79,13 @@ If you do not send log messages, the sender does not connect to the host.
 `timeout` :: timeout for send, in seconds. The default timeout is 3000 sec.
 `buffer-capacity` :: the size in bytes of the internal buffer which contains pending log messages. A size of each log messages must be less than or equal to this value. The default is 8MB.
 `buffer-overflow-handler` :: when the internal buffer overflows, this procedure is called with 3 arguments: the sender, the buffer port created by `open-output-uvector`, and the message string that is being put into the buffer. The default handler simply ignore overflows.
+
+#### Procedure: `make-fluent-logger-unix-domain-socket-sender :key path log-drain timeout buffer-capaticy buffer-overflow-handler`
+
+Similar to xref:make-fluent-logger-inet-socket-sender[make-fluent-logger-inet-socket-sender], but sends logs via a unix domain socket.
+
+`path` :: the path to the unix domain socket.
+`log-drain` :: see xref:make-fluent-logger-inet-socket-sender[make-fluent-logger-inet-socket-sender]
+`timeout` :: see xref:make-fluent-logger-inet-socket-sender[make-fluent-logger-inet-socket-sender]
+`buffer-capacity` :: see xref:make-fluent-logger-inet-socket-sender[make-fluent-logger-inet-socket-sender]
+`buffer-overflow-handler` :: see xref:make-fluent-logger-inet-socket-sender[make-fluent-logger-inet-socket-sender]
