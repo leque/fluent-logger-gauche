@@ -1,4 +1,4 @@
-# fluent-logger-gauche
+# fluent-logger-gauche image:https://travis-ci.org/leque/fluent-logger-gauche.svg?branch=master["Build Status", link="https://travis-ci.org/leque/fluent-logger-gauche"]
 
 A structured logger for https://www.fluentd.org/[Fluentd]
 implemented in http://practical-scheme.net/gauche/[Gauche].
