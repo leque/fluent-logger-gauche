@@ -1,0 +1,18 @@
+language: generic
+sudo: false
+addons:
+  apt:
+    packages:
+    - zlib1g-dev
+    - libgdbm-dev
+    - autoconf
+env:
+  - GAUCHE_VERSION=0.9.4
+  - GAUCHE_VERSION=0.9.5
+before_install:
+  - sh .travis-gauche.sh
+script:
+  - gosh -V
+  - autoconf
+  - ./configure
+  - make check

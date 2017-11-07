@@ -7,6 +7,20 @@ implemented in http://practical-scheme.net/gauche/[Gauche].
 
 MIT
 
+## Requirement
+
+* Gauche 0.9.4 or later
+
+## Installation
+
+[source,shell]
+----
+$ autoconf
+$ ./configure
+$ make check
+$ sudo make install
+----
+
 ## API
 ### Module: `fluent-logger`
 #### Class: `<fluent-logger>`
